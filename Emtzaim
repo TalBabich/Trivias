@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>טריווית אמצעים</title>
+    <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+      background-color: #e0f7fa;
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+    .question {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    .answers {
+      margin-bottom: 20px;
+    }
+    .answers label {
+      display: block;
+      margin: 5px 0;
+    }
+    #nextBtn, #restartBtn, #startBtn {
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-size: 1em;
+    }
+    #result {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    .summary {
+      margin-top: 30px;
+      border-top: 1px solid #999;
+      padding-top: 20px;
+    }
+    .summary .question-summary {
+      margin-bottom: 60px;
+      white-space: pre-line;
+    }
+    .correct-mark {
+      color: green;
+      font-weight: bold;
+    }
+    #intro {
+      font-size: 1.1em;
+      margin-bottom: 20px;
+    }
+    #counter {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        font-size: 1.4em;
+        padding: 15px;
+      }
+      h1 {
+        font-size: 1.8em;
+        text-align: center;
+      }
+      #nextBtn, #restartBtn, #startBtn {
+        width: 100%;
+        font-size: 1.1em;
+        padding: 15px;
+        margin: 15px 0;
+      }
+      .question {
+        font-size: 1.2em;
+      }
+      .answers label {
+        font-size: 1.1em;
+        padding: 10px 0;
+      }
+      #result {
+        font-size: 1.3em;
+      }
+      #intro {
+        font-size: 1.2em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>טריווית האמצעים הגדולה</h1>
+  <div id="introContainer">
+    <div id="intro">
+      ברוכים הבאים לשאלון טריוויה בנושא אמצעי גו"ז.
+      שימו לב כי ישנן שאלות בהן יש רק תשובה אחת נכונה וישנן שאלות בהן יש מספר תשובות נכונות.
+      בהצלחה!
+    </div>
+    <button id="startBtn">תחילת משחק</button>
+  </div>
+
+  <div id="game" style="display:none">
+    <div id="counter"></div>
+    <div id="questionContainer"></div>
+    <button id="nextBtn">שאלה הבאה</button>
+    <div id="result"></div>
+    <button id="restartBtn" style="display:none">התחל מחדש</button>
+    <div id="summary"></div>
+  </div>
+
+  <script>
+    const allQuestions = [
+	{question: "במידה ומתקבלת התרעה בערוץ As ב- AP4C, בנוכחות של איזה חל"ך עלינו לחשוד?",
+        options: ["לואיזיט", "סארין", "סומאן", "נוביצ'וק"],
+        correctAnswers: [3],
+        multiple: false},
+		{
+        question: "במידה ונרצה לבצע דגימת חומרים בפאזה גית, באמצעות ה- AP4C, באיזה קנה נשתמש?",
+        options: ["קנה מקטרת", "קנה ארובה"],
+        correctAnswers: [1],
+        multiple: false
+      },
+      {
+        question: "מהו סף ההתרעה ב-AP4C שמסמן נוכחות חומר בריכוז מספיק גבוה לבדיקה באמצעות כרמ"ל?",
+        options: ["נורית 1 מספיקה", "3-4 נוריות", "2-3 נוריות", "5 נוריות"],
+        correctAnswers: [2],
+        multiple: false
+      },
+      {
+        question: "אילו מבין התשובות הבאות מתארת דגשי עבודה עם ה AP4C?",
+        options: ["אין לכוון את המכשיר אל השמש ללא קנה שמורכב עליו", "אין לדגום במידה ויש נוריות שכבר דולקות", "במידה והגענו לחיווי של 5 נוריות עלינו להתרחק מהאזור המזהם על מנצת שהמכשיר לא ייכנס לרוויה", "אין לקרב את מחסנית המימן לאש"],
+        correctAnswers: [0,1,3],
+        multiple: true
+      },
+      {
+        question: "מהו סדר הפעולות הנכון להרכבת ה AP4C?",
+        options: ["קנה-סוללה-זמזם-חסנית מימן,", "זמזם-מחסנית מימן-סוללה-קנה", "סוללה-קנה-מחסנית מימן-זמזם", "קנה-סוולה-מחסנית מימן-זמזם"],
+        correctAnswers: [3],
+        multiple: false
+      },
+      {
+        question: "סמן את כל התופעות הקליניות האפשריות כתוצאה מחשיפה לגז עצבים:",
+        options: ["קוצר נשימה", "שיתוק זמני בגפיים", "טשטוש בראייה", "הזיות", "הפרשות מוגברות"].sort(() => 0.5 - Math.random()),
+        correctAnswers: [0, 2, 4],
+        multiple: true
+      },
+      {
+        question: "גז VX ניתן לזיהוי בקלות על ידי חוש הריח.",
+        options: ["נכון", "לא נכון"],
+        correctAnswers: [1],
+        multiple: false
+      },
+      {
+        question: "נוביצ'וק הוא גז עצבים שפותח במערב אירופה.",
+        options: ["נכון", "לא נכון"],
+        correctAnswers: [1],
+        multiple: false
+      },
+      {
+        question: "עוצמתו של גז סארין גבוהה פי 500 מזו של גז הציאניד.",
+        options: ["נכון", "לא נכון"],
+        correctAnswers: [0],
+        multiple: false
+      }, 
+	  {
+	  question: "מהו שמו של הגז המדמיע הנפוץ ביותר בשימוש כוחות ביטחון?",
+	  options: ["CN", "CS", "DM", "OC"],
+	  correctAnswers: [1],
+	  multiple: false
+	},
+	{
+	  question: "ממה נובעת השפעת גז CS על רקמות ריריות?",
+	  options: [
+		"שחרור חנקן דו-חמצני",
+		"שחרור אטומי כלור או חומצת HCl",
+		"תגובה עם חלבון בעור",
+		"קירור הרקמות הפנימיות"
+	  ],
+	  correctAnswers: [1],
+	  multiple: false
+	},
+	{
+	  question: "באיזו דרך ניתן לפזר גז מדמיע?",
+	  options: [
+		"מטול M203",
+		"רימון יד",
+		"רחפן",
+		"כל התשובות נכונות"
+	  ],
+	  correctAnswers: [3],
+	  multiple: false
+	},
+	{
+	  question: "האם ריכוז נמוך של גז CS לאורך זמן מזיק יותר מריכוז גבוה לזמן קצר?",
+	  options: ["נכון", "לא נכון"],
+	  correctAnswers: [0],
+	  multiple: false
+	},
+	{
+	  question: "מהם סימנים נפוצים של חשיפה לגז CS?",
+	  options: [
+		"תחושת שרפה בעור",
+		"דמעות",
+		"שיעול",
+		"כל התשובות נכונות"
+	  ],
+	  correctAnswers: [3],
+	  multiple: false
+	},
+	{
+	  question: "מהי מסיסותו של CS במים?",
+	  options: [
+		"גבוהה מאוד",
+		"בינונית",
+		"נמוכה מאוד",
+		"תלויה בטמפרטורה בלבד"
+	  ],
+	  correctAnswers: [2],
+	  multiple: false
+	},
+	{
+	  question: "אילו אמצעים מפזרים גז מדמיע בטווח קצר?",
+	  options: [
+		"רימון יד",
+		"פיזור ממסוק",
+		"מדוכה",
+		"מרסס גז"
+	  ],
+	  correctAnswers: [0, 3],
+	  multiple: true
+	},
+	{
+	  question: "מהם סיכונים פוטנציאליים לגז מדמיע באוכלוסיות רגישות?",
+	  options: [
+		"התקף לב מיידי",
+		"הרעלה נוירולוגית קבועה",
+		"פגיעה קשה בריאות",
+		"שיתוק גפיים"
+	  ],
+	  correctAnswers: [2],
+	  multiple: false
+	},
+	{
+	  question: "מה הסיכון בשימוש בגז מדמיע בחלל סגור?",
+	  options: [
+		"אין סיכון",
+		"ירידה ביעילות החומר",
+		"חשיפה לריכוזים גבוהים ומסוכנים",
+		"הפחתת ריח הגז"
+	  ],
+	  correctAnswers: [2],
+	  multiple: false
+	},
+	{
+	  question: "מה הופך את הפנטניל למסוכן במיוחד?",
+	  options: [
+		"הוא משמש רק לוטרינריה",
+		"הוא מעורר תגובת היסטמין גבוהה",
+		"המינון הקטלני שלו נמוך במיוחד",
+		"הוא מתפרק מהר בדם"
+	  ],
+	  correctAnswers: [2],
+	  multiple: false
+	},
+	{
+	  question: "כיצד משתמשים בפנטניל באופן לא חוקי?",
+	  options: [
+		"חימום ושאיפה מאדי נייר כסף",
+		"עירוי תוך ורידי בלבד",
+		"המסה במים ושתייה",
+		"בליעת טבליות רפואיות"
+	  ],
+	  correctAnswers: [0],
+	  multiple: false
+	},
+	{
+	  question: "מהם תסמיני תסמונת גמילה אפשריים לאחר שימוש בפנטניל?",
+	  options: [
+		"חרדה ודיכאון",
+		"עליה במשקל",
+		"פריחה בעור",
+		"הזיות קלות בלבד"
+	  ],
+	  correctAnswers: [0],
+	  multiple: false
+	},
+	{
+	  question: "איזה מהבאים נכון לגבי קרפנטניל?",
+	  options: [
+		"הוא פחות חזק מפנטניל",
+		"משמש להרדמת חיות גדולות כמו פילים",
+		"מאושר לשימוש קליני שגרתי בבני אדם",
+		"אינו עובר את מחסום הדם-מוח"
+	  ],
+	  correctAnswers: [1],
+	  multiple: false
+	},
+	{
+	  question: "מה הסכנה המרכזית באנלוגים לא חוקיים של פנטניל?",
+	  options: [
+		"הם לא פעילים כלל",
+		"הם יקרים מאוד",
+		"הם חזקים ואינם ניתנים לזיהוי",
+		"הם מוגבלים לשימוש רק בבית חולים"
+	  ],
+	  correctAnswers: [2],
+	  multiple: false
+	},
+	{
+	  question: "סמן את תופעות הלוואי הנפוצות (יותר מ-10%) של פנטניל:",
+	  options: [
+		"עצירות",
+		"הזיות",
+		"שלשול",
+		"בלבול"
+	  ],
+	  correctAnswers: [0, 2, 3],
+	  multiple: true
+	},
+	{
+	  question: "כיצד ניסו לשתק את החוטפים בתיאטרון במוסקבה בשנת 2002?",
+	  options: [
+		"על ידי חומר מרדים מהיר",
+		"באמצעות חומר מבוסס פנטניל",
+		"על ידי עשן מדמיע",
+		"באמצעות חנקן נוזלי"
+	  ],
+	  correctAnswers: [1],
+	  multiple: false
+	},
+	{
+	  question: "כיצד ניתן להפוך את השפעת הפנטניל?",
+	  options: [
+		"על ידי שתיית מים קרים",
+		"על ידי הזרקת אפינפרין",
+		"על ידי נלוקסון ונלטרקסון",
+		"לא ניתן להפוך את השפעתו"
+	  ],
+	  correctAnswers: [2],
+	  multiple: false
+	},
+	{
+	  question: "מה נכון לגבי קרפנטניל?",
+	  options: [
+		"חזק פי 10 ממורפין",
+		"משמש לעיתים כחומר נשק כימי",
+		"ניתן דרך האף בלבד",
+		"מתפרק בגוף תוך 10 שניות"
+	  ],
+	  correctAnswers: [1],
+	  multiple: false
+	},
+	{
+        question: "מהי צורתו של גז החרדל בטמפרטורת החדר?",
+        options: ["נוזל חסר צבע וצמיגי", "גז צהוב עם ריח חרדל", "נוזל שקוף עם ריח חומצה", "אבקה לבנה"],
+        correctAnswers: [0],
+        multiple: false
+      },
+	  {
+        question: "מה גורם לריח האופייני של גז החרדל בשימוש צבאי?",
+        options: ["תוצרי פירוק של החומר", "ערבוב עם חומרים נוספים", "תגובה עם עור האדם", "החומר עצמו בעל ריח חרדל"],
+        correctAnswers: [1],
+        multiple: false
+      },
+	  {
+        question: "כיצד מופץ גז חרדל בשדה הקרב?",
+        options: ["על ידי מסכות גז", "באמצעות תרסיס ידני בלבד", "בריסוס ממטוסים ופצצות ארטילריה", "באידוי דרך מים"],
+        correctAnswers: [2],
+        multiple: false
+      },
+	  {
+        question: "מהם הסימפטומים הראשוניים לאחר חשיפה לגז חרדל?",
+        options: ["בחילה מיידית", "חום גבוה", "כאב חד מיידי", "אין סימנים מיידיים נראים לעין"],
+        correctAnswers: [3],
+        multiple: false
+      },
+	  {
+        question: "אילו תופעות מופיעות בעור לאחר יממה מחשיפה לגז חרדל?",
+        options: ["פצעים יבשים", "כתמים כהים", "שלפוחיות גדולות עם נוזל צהוב", "גרד קל בלבד"],
+        correctAnswers: [2],
+        multiple: false
+      },
+	  {
+        question: "איזו דרגת כווייה יכולה להיגרם מחשיפה לגז חרדל?",
+        options: ["ראשונה בלבד", "שנייה בלבד", "ראשונה ושנייה", "אפילו שלישית"],
+        correctAnswers: [3],
+        multiple: false
+      },
+	  {
+        question: "מהו טיפול מיידי מומלץ לאחר חשיפה לגז חרדל (לפני הופעת תסמינים)?",
+        options: ["שטיפת מים בלבד", "חמצן טהור", "מריחת PVP-I (פובידון יודי)", "אין מה לעשות"],
+        correctAnswers: [2],
+        multiple: false
+      },
+	  {
+        question: "מהי תוצאה אפשרית של שאיפת גז חרדל בריכוז גבוה?",
+        options: ["שיעול קל בלבד", "אובדן שיער", "שלפוחיות בריאות ודימום פנימי", "חום גבוה"],
+        correctAnswers: [2],
+        multiple: false
+      },
+	  {
+        question: "מדוע גז חרדל נחשב גם למוטגן וקרצינוגן?",
+        options: ["הוא פוגע רק בתאים עוריים", "הוא משנה את צבע הדם", "הוא עלול לגרום לסרטן לאורך זמן", "הוא גורם לשלשול חריף"],
+        correctAnswers: [2],
+        multiple: false
+      }
+	  ]; // כאן תיכנס רשימת השאלות המלאה — מיד אוסיף אותן
+
+    let questions = [];
+    let currentQuestion = 0;
+    let score = 0;
+    let userAnswers = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const introContainer = document.getElementById("introContainer");
+      const gameContainer = document.getElementById("game");
+      const questionContainer = document.getElementById("questionContainer");
+      const counter = document.getElementById("counter");
+      const result = document.getElementById("result");
+      const summary = document.getElementById("summary");
+      const nextBtn = document.getElementById("nextBtn");
+      const restartBtn = document.getElementById("restartBtn");
+      const startBtn = document.getElementById("startBtn");
+
+      startBtn.addEventListener("click", () => {
+        questions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 15);
+        introContainer.style.display = "none";
+        gameContainer.style.display = "block";
+        showQuestion();
+      });
+
+      nextBtn.addEventListener("click", () => {
+        const selected = Array.from(document.querySelectorAll("input[name='answer']:checked"))
+          .map(el => parseInt(el.value));
+
+        if (selected.length === 0) return alert("בחר תשובה לפני שממשיכים.");
+
+        const correct = questions[currentQuestion].correctAnswers.sort().join(',');
+        const user = selected.sort().join(',');
+        if (correct === user) score += 100 / questions.length;
+
+        userAnswers.push({
+          question: questions[currentQuestion].question,
+          options: questions[currentQuestion].options,
+          correctAnswers: questions[currentQuestion].correctAnswers,
+          selected
+        });
+
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          showQuestion();
+        } else {
+          showSummary();
+        }
+      });
+
+      restartBtn.addEventListener("click", () => location.reload());
+
+      function showQuestion() {
+        const q = questions[currentQuestion];
+        counter.textContent = `שאלה ${currentQuestion + 1} מתוך ${questions.length}`;
+        questionContainer.innerHTML = `<div class='question'>${q.question}</div>`;
+        const inputType = q.multiple ? "checkbox" : "radio";
+        const answersHTML = q.options.map((opt, i) =>
+          `<label><input type='${inputType}' name='answer' value='${i}'> ${opt}</label>`
+        ).join("");
+        questionContainer.innerHTML += `<div class='answers'>${answersHTML}</div>`;
+      }
+
+      function showSummary() {
+        questionContainer.style.display = "none";
+        nextBtn.style.display = "none";
+        counter.style.display = "none";
+        result.innerHTML = `ציון סופי: ${score.toFixed(0)} / 100`;
+        restartBtn.style.display = "block";
+
+        summary.classList.add("summary");
+        summary.innerHTML = "<h2>סקירת תשובות</h2>" + userAnswers.map(ans => {
+          const correctMarks = ans.options.map((opt, i) =>
+            ans.correctAnswers.includes(i) ? `${opt} ✅` : opt
+          ).join("\n");
+          return `<div class='question-summary'>${ans.question}\n\n${correctMarks}</div>`;
+        }).join("");
+      }
+    });
+  </script>
+</body>
+</html>
