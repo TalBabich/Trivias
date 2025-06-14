@@ -2,15 +2,18 @@
 <html lang="he">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>טריווית החל"כים הגדולה</title>
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       direction: rtl;
       padding: 20px;
       max-width: 700px;
       margin: auto;
       background-color: #dfe8c3;
+      font-size: 1.1em;
+      line-height: 1.6;
     }
     .question {
       font-weight: bold;
@@ -26,6 +29,7 @@
     #nextBtn, #restartBtn, #startBtn {
       padding: 10px 20px;
       margin-top: 10px;
+      font-size: 1em;
     }
     #result {
       font-size: 1.2em;
@@ -52,6 +56,16 @@
     #counter {
       margin-top: 10px;
       font-weight: bold;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 1.2em;
+        padding: 10px;
+      }
+      #nextBtn, #restartBtn, #startBtn {
+        width: 100%;
+        box-sizing: border-box;
+      }
     }
   </style>
 </head>
