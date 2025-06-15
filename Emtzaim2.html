@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>טריווית החל"כים הגדולה</title>
+  <title>חידון רענון אמצעי גו"ז</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -99,7 +99,24 @@
   </style>
 </head>
 <body>
-  <h1>טריווית החל"כים הגדולה</h1>
+  <h1>חידון רענון אמצעי גו"ז</h1>
+
+  <div id="introContainer">
+    <div id="intro">
+      ברוכים הבאים לחידון בנושא אמצעי גילוי וזיהוי. אנא לחצו על "התחל משחק" כדי להתחיל.
+    </div>
+    <button id="startBtn">התחל משחק</button>
+  </div>
+
+  <div id="game" style="display:none">
+    <div id="counter"></div>
+    <div id="questionContainer"></div>
+    <button id="nextBtn">שאלה הבאה</button>
+    <div id="result"></div>
+    <button id="restartBtn" style="display:none">התחל מחדש</button>
+    <div id="summary"></div>
+  </div>
+
   <script>
     const allQuestions = [
       {
@@ -113,6 +130,82 @@
         multiple: false
       }
     ];
+
+    let questions = [];
+    let currentQuestion = 0;
+    let score = 0;
+    let userAnswers = [];
+
+    const introContainer = document.getElementById("introContainer");
+    const gameContainer = document.getElementById("game");
+    const questionContainer = document.getElementById("questionContainer");
+    const counter = document.getElementById("counter");
+    const result = document.getElementById("result");
+    const summary = document.getElementById("summary");
+    const nextBtn = document.getElementById("nextBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const startBtn = document.getElementById("startBtn");
+
+    startBtn.addEventListener("click", () => {
+      questions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 15);
+      introContainer.style.display = "none";
+      gameContainer.style.display = "block";
+      showQuestion();
+    });
+
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      counter.textContent = `שאלה ${currentQuestion + 1} מתוך ${questions.length}`;
+      questionContainer.innerHTML = `<div class='question'>${q.question}</div>`;
+      const inputType = q.multiple ? "checkbox" : "radio";
+      const answersHTML = q.options.map((opt, i) =>
+        `<label><input type='${inputType}' name='answer' value='${i}'> ${opt}</label>`
+      ).join("");
+      questionContainer.innerHTML += `<div class='answers'>${answersHTML}</div>`;
+    }
+
+    nextBtn.addEventListener("click", () => {
+      const selected = Array.from(document.querySelectorAll("input[name='answer']:checked"))
+        .map(el => parseInt(el.value));
+
+      if (selected.length === 0) return alert("בחר תשובה לפני שממשיכים.");
+
+      const correct = questions[currentQuestion].correctAnswers.sort().join(',');
+      const user = selected.sort().join(',');
+      if (correct === user) score += 100 / questions.length;
+
+      userAnswers.push({
+        question: questions[currentQuestion].question,
+        options: questions[currentQuestion].options,
+        correctAnswers: questions[currentQuestion].correctAnswers,
+        selected
+      });
+
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        showSummary();
+      }
+    });
+
+    restartBtn.addEventListener("click", () => location.reload());
+
+    function showSummary() {
+      questionContainer.style.display = "none";
+      nextBtn.style.display = "none";
+      counter.style.display = "none";
+      result.innerHTML = `ציון סופי: ${score.toFixed(0)} / 100`;
+      restartBtn.style.display = "block";
+
+      summary.classList.add("summary");
+      summary.innerHTML = "<h2>סקירת תשובות</h2>" + userAnswers.map(ans => {
+        const correctMarks = ans.options.map((opt, i) =>
+          ans.correctAnswers.includes(i) ? `${opt} ✅` : opt
+        ).join("\n");
+        return `<div class='question-summary'>${ans.question}\n\n${correctMarks}</div>`;
+      }).join("");
+    }
   </script>
 </body>
 </html>
