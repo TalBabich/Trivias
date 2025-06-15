@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>טריווית החל"כים הגדולה</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+      background-color: #e0f7fa; /* תכלת בהיר ועדין */
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+    .question {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    .answers {
+      margin-bottom: 20px;
+    }
+    .answers label {
+      display: block;
+      margin: 5px 0;
+    }
+    #nextBtn, #restartBtn, #startBtn {
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-size: 1em;
+    }
+    #result {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    .summary {
+      margin-top: 30px;
+      border-top: 1px solid #999;
+      padding-top: 20px;
+    }
+    .summary .question-summary {
+      margin-bottom: 60px;
+      white-space: pre-line;
+    }
+    .correct-mark {
+      color: green;
+      font-weight: bold;
+    }
+    #intro {
+      font-size: 1.1em;
+      margin-bottom: 20px;
+    }
+    #counter {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        font-size: 1.4em;
+        padding: 15px;
+      }
+      h1 {
+        font-size: 1.8em;
+        text-align: center;
+      }
+      #nextBtn, #restartBtn, #startBtn {
+        width: 100%;
+        font-size: 1.1em;
+        padding: 15px;
+        margin: 15px 0;
+      }
+      .question {
+        font-size: 1.2em;
+      }
+      .answers label {
+        font-size: 1.1em;
+        padding: 10px 0;
+      }
+      #result {
+        font-size: 1.3em;
+      }
+      #intro {
+        font-size: 1.2em;
+      }
+    }
+    .image-question {
+      margin-top: 15px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .image-question img {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>טריווית החל"כים הגדולה</h1>
+  <script>
+    const allQuestions = [
+      {
+        question: "הכרמל הראה את התוצאה הבאה:<br><div class='image-question'><img src=\"https://raw.githubusercontent.com/TalBabich/Trivias/main/lewisite_test.png\" alt=\"תוצאת כרמל\"></div><br>מה משמעות התוצאה?",
+        options: [
+          "השטח נקי ואין חשש לנוכחות חל\"ך עצבים ו/או חל\"ך כוויה",
+          "יש חשש לנוכחות חל\"ך עצבים אבל אין חשש לנוכחות חל\"ך כוויה",
+          "יש חשש לנוכחות חל\"ך כוויה אבל אין חשש לנוכחות חל\"ך עצבים"
+        ],
+        correctAnswers: [0],
+        multiple: false
+      }
+    ];
+  </script>
+</body>
+</html>
