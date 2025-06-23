@@ -49,6 +49,14 @@
       color: green;
       font-weight: bold;
     }
+    .correct-answer {
+      color: green;
+      font-weight: bold;
+    }
+    .wrong-answer {
+     color: red;
+     text-decoration: underline;
+    }
     #intro {
       font-size: 1.1em;
       margin-bottom: 20px;
@@ -516,12 +524,24 @@
         restartBtn.style.display = "block";
 
         summary.classList.add("summary");
-        summary.innerHTML = "<h2>סקירת תשובות</h2>" + userAnswers.map(ans => {
-          const correctMarks = ans.options.map((opt, i) =>
-            ans.correctAnswers.includes(i) ? `${opt} ✅` : opt
-          ).join("\n");
-          return `<div class='question-summary'>${ans.question}\n\n${correctMarks}</div>`;
-        }).join("");
+	summary.innerHTML = "<h2>סקירת תשובות</h2>" + userAnswers.map(ans => {
+	const optionsMarkup = ans.options.map((opt, i) => {
+	const isCorrect = ans.correctAnswers.includes(i);
+	const isSelected = ans.selected.includes(i);
+	    
+	if (isSelected && isCorrect) {
+		return `<span class="correct-answer">✅ ${opt}</span>`;
+	} else if (isSelected && !isCorrect) {
+	      return `<span class="wrong-answer">❌ ${opt}</span>`;
+	} else if (!isSelected && isCorrect) {
+	      return `<span>✅ ${opt}</span>`;
+	} else {
+	      return `<span>${opt}</span>`;
+	}
+	}).join("<br>");
+	
+	  return `<div class='question-summary'>${ans.question}<br><br>${optionsMarkup}</div>`;
+	}).join("");
       }
     });
   </script>
